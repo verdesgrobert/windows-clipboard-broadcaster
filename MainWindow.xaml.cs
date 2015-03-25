@@ -12,8 +12,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Appboxstudios.ClipboardBroadcaster;
 
-namespace ClipboardBroadcasterView
+namespace Appboxstudios.ClipboardBroadcaster
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -23,6 +24,12 @@ namespace ClipboardBroadcasterView
         public MainWindow()
         {
             InitializeComponent();
+            Loaded += MainWindow_Loaded;
+        }
+
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            Program.Main(null);
         }
     }
 }

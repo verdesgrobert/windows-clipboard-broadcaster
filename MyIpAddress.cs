@@ -2,6 +2,7 @@ using System.Net;
 
 namespace Appboxstudios.ClipboardBroadcaster
 {
+   
     public class MyIpAddress : IPAddress
     {
         public MyIpAddress(IPAddress ip)

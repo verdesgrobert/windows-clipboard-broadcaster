@@ -23,16 +23,16 @@ namespace Appboxstudios.ClipboardBroadcaster
         private static void SendMessage(string text, byte messageType = 0, byte[] data = null, string footer = "")
         {
             LastClipBoardSent = DateTime.Now;
-            foreach (MyIPAddress address in remoteAddresses)
+            foreach (MyIpAddress address in remoteAddresses)
             {
                 SendMessage(address, text, messageType, data, footer);
             }
             LastClipBoardSent = DateTime.Now;
         }
 
-        private static void SendMessage(MyIPAddress add, string text, byte messageType = 0, byte[] data = null, string footer = "")
+        private static void SendMessage(MyIpAddress add, string text, byte messageType = 0, byte[] data = null, string footer = "")
         {
-            while (add.IsSending) { Thread.Sleep(10); }
+            while (add.IsSending) { Thread.Sleep(5); }
             add.IsSending = true;
             try
             {
@@ -150,10 +150,10 @@ namespace Appboxstudios.ClipboardBroadcaster
         private static string prevText = "";
         private static StringCollection lastFilesToTransfer;
         private static byte[] prevImage;
-        static List<MyIPAddress> remoteAddresses = new List<MyIPAddress>();
+        static List<MyIpAddress> remoteAddresses = new List<MyIpAddress>();
 
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
 
             LastClipBoardSent = DateTime.Today;
@@ -193,10 +193,9 @@ namespace Appboxstudios.ClipboardBroadcaster
             int cntr = 0;
             foreach (string address in addrs)
             {
-                string subnet = "192.168.127.";
                 string addr = address;
                 int last = addr.LastIndexOf(".") + 1;
-                subnet = addr.Substring(0, last);
+                string subnet = addr.Substring(0, last);
                 for (int x = 1; x <= 255; x++)
                 {
                     cntr++;
@@ -214,7 +213,7 @@ namespace Appboxstudios.ClipboardBroadcaster
                             if (cl != null)
                                 if (cl.Connected)
                                 {
-                                    remoteAddresses.Add(new MyIPAddress(ip));
+                                    remoteAddresses.Add(new MyIpAddress(ip));
                                     Console.WriteLine(ip + "\t" + DateTime.Now.Subtract(now).TotalMilliseconds);
                                 }
                         }
@@ -248,63 +247,82 @@ namespace Appboxstudios.ClipboardBroadcaster
                     Thread.Sleep(500);
                     if (Clipboard.ContainsText())
                     {
-                        string text = Clipboard.GetText();
-                        if (text != prevText)
-                        {
-                            prevText = text;
-                            SendMessage(text);
-                        }
+                        HandleClipboardText();
                     }
                     else if (Clipboard.ContainsFileDropList())
                     {
-                        var filesToTransfer = Clipboard.GetFileDropList();
-                        if (filesToTransfer == lastFilesToTransfer) continue;
-                        lastFilesToTransfer = filesToTransfer;
-                        long total = 0;
-                        foreach (string file in filesToTransfer)
-                        {
-                            FileInfo f = new FileInfo(file);
-                            total += f.Length;
-                        }
-                        string bytes = "bytes";
-                        if (total / 1024 > 1024)
-                        {
-                            bytes = "KB";
-                            if (total / 1024 / 1024 > 1024)
-                            {
-                                bytes = "MB";
-                                if (total / 1024 / 1024 / 1024 > 1024)
-                                {
-                                    bytes = "GB";
-                                }
-                            }
-                        }
-                        string dataToSend = string.Join("\n", filesToTransfer.Cast<string>().ToList());
-                        SendMessage(dataToSend, 1, null, total + bytes);
+                        HandleClipboardFiles();
                     }
                     else if (Clipboard.ContainsImage())
                     {
-                        var filesToTransfer = Clipboard.GetImage();
-                        if (filesToTransfer == null) continue;
-                        byte[] image = null;
-                        using (MemoryStream ms = new MemoryStream())
-                        {
-                            filesToTransfer.Save(ms, ImageFormat.Jpeg);
-                            image = ms.ToArray();
-                        }
-                        filesToTransfer.Save("d:\\Share\\shareableImage.jpg", ImageFormat.Jpeg);
-                        if (image != prevImage)
-                        {
-                            prevImage = image;
-                            Clipboard.Clear();
-                            SendMessage("", 2, image);
-                        }
+                        HandleClipboardImage();
                     }
                 }
                 catch (Exception exception)
                 {
                     Debug.WriteLine(exception.Message + Environment.NewLine + exception.StackTrace);
                 }
+            }
+        }
+
+        private static void HandleClipboardImage()
+        {
+            var filesToTransfer = Clipboard.GetImage();
+            if (filesToTransfer != null)
+            {
+                byte[] image = null;
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    filesToTransfer.Save(ms, ImageFormat.Jpeg);
+                    image = ms.ToArray();
+                }
+                filesToTransfer.Save("d:\\Share\\shareableImage.jpg", ImageFormat.Jpeg);
+                if (image != prevImage)
+                {
+                    prevImage = image;
+                    Clipboard.Clear();
+                    SendMessage("", 2, image);
+                }
+            }
+        }
+
+        private static void HandleClipboardFiles()
+        {
+            var filesToTransfer = Clipboard.GetFileDropList();
+            if (filesToTransfer != lastFilesToTransfer)
+            {
+                lastFilesToTransfer = filesToTransfer;
+                long total = 0;
+                foreach (string file in filesToTransfer)
+                {
+                    FileInfo f = new FileInfo(file);
+                    total += f.Length;
+                }
+                string bytes = "bytes";
+                if (total / 1024 > 1024)
+                {
+                    bytes = "KB";
+                    if (total / 1024 / 1024 > 1024)
+                    {
+                        bytes = "MB";
+                        if (total / 1024 / 1024 / 1024 > 1024)
+                        {
+                            bytes = "GB";
+                        }
+                    }
+                }
+                string dataToSend = string.Join("\n", filesToTransfer.Cast<string>().ToList());
+                SendMessage(dataToSend, 1, null, total + bytes);
+            }
+        }
+
+        private static void HandleClipboardText()
+        {
+            string text = Clipboard.GetText();
+            if (text != prevText)
+            {
+                prevText = text;
+                SendMessage(text);
             }
         }
 
@@ -327,16 +345,5 @@ namespace Appboxstudios.ClipboardBroadcaster
             }
             return hiddenFiles;
         }
-    }
-
-    public class MyIPAddress : IPAddress
-    {
-        public MyIPAddress(IPAddress ip)
-            : base(ip.GetAddressBytes())
-        {
-            IsSending = false;
-        }
-
-        public bool IsSending { get; set; }
     }
 }
