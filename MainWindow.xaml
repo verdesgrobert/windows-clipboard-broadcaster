@@ -1,0 +1,10 @@
+﻿<Window x:Class="ClipboardBroadcasterView.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:roundProgressBar="clr-namespace:RoundProgressBar;assembly=RoundProgressBar"
+        Title="MainWindow" Height="350" Width="525">
+    <Grid>
+        <roundProgressBar:CircularProgressBar x:Name="progressBarLoading" />
+
+    </Grid>
+</Window>
