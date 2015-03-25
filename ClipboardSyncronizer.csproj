@@ -77,7 +77,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RoundProgressBar\RoundProgressBar.csproj">
+    <ProjectReference Include="..\..\CircleProgressBarWPF\RoundProgressBar.csproj">
       <Project>{5a5e81ec-39ba-4a86-b962-668d84f1c8df}</Project>
       <Name>RoundProgressBar</Name>
     </ProjectReference>
