@@ -19,7 +19,7 @@ namespace Appboxstudios.ClipboardBroadcaster
         private static DateTime LastClipBoardSent;
         private static DateTime LastClipBoardReceived;
         private static int port = 20712;
-
+        private static Action<string> output = msg => Console.WriteLine(msg);
         private static void SendMessage(string text, byte messageType = 0, byte[] data = null, string footer = "")
         {
             LastClipBoardSent = DateTime.Now;
@@ -91,7 +91,7 @@ namespace Appboxstudios.ClipboardBroadcaster
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                output(e + "");
             }
             add.IsSending = false;
         }
@@ -118,7 +118,7 @@ namespace Appboxstudios.ClipboardBroadcaster
             while (true)
             {
                 var client = tcpListener.AcceptTcpClient();
-                Console.WriteLine("Connected:" + client.Client.RemoteEndPoint);
+                output("Connected:" + client.Client.RemoteEndPoint);
                 var stream = client.GetStream();
                 Thread.Sleep(1000);
                 bool ok = client.Available > 0;
@@ -134,11 +134,11 @@ namespace Appboxstudios.ClipboardBroadcaster
                             prevText = data;
                             Clipboard.SetText(data);
                         }
-                        Console.WriteLine(data);
+                        output(data);
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(e);
+                        output(e + "");
                     }
                 else
                 {
@@ -171,14 +171,14 @@ namespace Appboxstudios.ClipboardBroadcaster
         }
 
 
-        static List<IPAddress> GetMyIps()
+        static void GetMyIps()
         {
             List<IPAddress> addresses = new List<IPAddress>();
             NetworkInterface[] networks = NetworkInterface.GetAllNetworkInterfaces();
             networks = networks.Where(conn => conn.OperationalStatus == OperationalStatus.Up && conn.NetworkInterfaceType != NetworkInterfaceType.Loopback).ToArray();
             foreach (NetworkInterface network in networks)
             {
-                Console.WriteLine("Unicast Addresses");
+                output("Unicast Addresses");
                 foreach (UnicastIPAddressInformation entry in network.GetIPProperties().UnicastAddresses)
                 {
                     if (entry.Address.AddressFamily == AddressFamily.InterNetwork)
@@ -199,7 +199,7 @@ namespace Appboxstudios.ClipboardBroadcaster
                 for (int x = 1; x <= 255; x++)
                 {
                     cntr++;
-                    Console.Title = (subnet + x) + ":" + cntr + "/" + tot;
+                    output((subnet + x) + ":" + cntr + "/" + tot);
                     if (remoteAddresses.Any(add => add.ToString() == subnet + x)) continue;
                     var ip = IPAddress.Parse(subnet + x);
                     try
@@ -214,19 +214,18 @@ namespace Appboxstudios.ClipboardBroadcaster
                                 if (cl.Connected)
                                 {
                                     remoteAddresses.Add(new MyIpAddress(ip));
-                                    Console.WriteLine(ip + "\t" + DateTime.Now.Subtract(now).TotalMilliseconds);
+                                    output(ip + "\t" + DateTime.Now.Subtract(now).TotalMilliseconds);
                                 }
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine(e);
+                            output(e + "");
                         }
 
                     }
                     catch (Exception ex) { }
                 }
             }
-            return addresses;
         }
 
         static void StartListeningForDevices()
@@ -344,6 +343,11 @@ namespace Appboxstudios.ClipboardBroadcaster
             {
             }
             return hiddenFiles;
+        }
+
+        public static void SetOutput(Action<string> action)
+        {
+            output = action;
         }
     }
 }
