@@ -6,5 +6,25 @@
     <Grid>
         <roundProgressBar:CircularProgressBar x:Name="progressBarLoading" Width="100" />
         <TextBlock Text="{Binding Status}" VerticalAlignment="Bottom" Margin="10" FontSize="30"/>
+        <ListBox>
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Width="70" Height="70">
+                        <roundProgressBar:CircularProgressBar HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBoxItem Background="Gray" Width="70" Height="70" Margin="5">
+                <roundProgressBar:CircularProgressBar HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </ListBoxItem>
+            <ListBoxItem Background="LightGray" Width="70" Height="70" Margin="5">
+                <roundProgressBar:CircularProgressBar HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </ListBoxItem>
+        </ListBox>
     </Grid>
 </Window>

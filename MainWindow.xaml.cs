@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -34,9 +35,13 @@ namespace Appboxstudios.ClipboardBroadcaster
             }
         }
 
-        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            await Task.Run(() => ClipBoardHelper.StartListeningForDevices());
+            var th = new Thread(async () =>
+            {
+                await Task.Run(() => ClipBoardHelper.StartListeningForDevices());
+            });
+            th.Start();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -154,22 +154,16 @@ namespace Appboxstudios.ClipboardBroadcaster
         static List<MyIpAddress> remoteAddresses = new List<MyIpAddress>();
 
 
-        public static void StartThreads()
+        public async static void StartThreads()
         {
             LastClipBoardSent = DateTime.Today;
             RefreshRemoteIps();
             Thread t1 = new Thread(ListenForClipboardChanges);
-            t1.SetApartmentState(ApartmentState.STA);
             t1.Start();
             Thread t2 = new Thread(StartListeningForClipBoard);
-            t2.SetApartmentState(ApartmentState.STA);
             t2.Start();
-            Thread t3 = new Thread(StartListeningForDevices);
-            t3.SetApartmentState(ApartmentState.STA);
-            t3.Start();
-
+            await StartListeningForDevices();
         }
-
 
         static void RefreshRemoteIps()
         {
@@ -228,7 +222,7 @@ namespace Appboxstudios.ClipboardBroadcaster
             }
         }
 
-        public async static void StartListeningForDevices()
+        public async static Task StartListeningForDevices()
         {
             while (true)
             {
@@ -243,7 +237,7 @@ namespace Appboxstudios.ClipboardBroadcaster
             {
                 try
                 {
-                    Thread.Sleep(500);
+                    Thread.Sleep(400);
                     if (Clipboard.ContainsText())
                     {
                         HandleClipboardText();
@@ -254,7 +248,8 @@ namespace Appboxstudios.ClipboardBroadcaster
                     }
                     else if (Clipboard.ContainsImage())
                     {
-                        HandleClipboardImage();
+                        ClipboardSafeThreadHandlingHelper.queue.Add(new ClipboardTask(ClipboardTaskTypeEnum.Image, ClipboardOperationTypeEnum.Copy, HandleClipboardImage));
+                        //HandleClipboardImage();
                     }
                 }
                 catch (Exception exception)
