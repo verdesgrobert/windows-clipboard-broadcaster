@@ -7,7 +7,7 @@ namespace Appboxstudios.ClipboardBroadcaster
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, INotifyPropertyChanged
+    public partial class MainWindow : INotifyPropertyChanged
     {
         private string _status;
 
@@ -16,7 +16,7 @@ namespace Appboxstudios.ClipboardBroadcaster
             InitializeComponent();
             Loaded += MainWindow_Loaded;
 
-            Program.SetOutput(msg =>
+            ClipBoardHelper.SetOutput(msg =>
             {
                 Status = msg;
             });
@@ -36,7 +36,7 @@ namespace Appboxstudios.ClipboardBroadcaster
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            await Task.Run(() => Program.StartListeningForDevices());
+            await Task.Run(() => ClipBoardHelper.StartListeningForDevices());
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

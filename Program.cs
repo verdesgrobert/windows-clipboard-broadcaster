@@ -15,7 +15,7 @@ using System.Windows.Forms;
 
 namespace Appboxstudios.ClipboardBroadcaster
 {
-    class Program
+    public class ClipBoardHelper
     {
         private static DateTime LastClipBoardSent;
         private static DateTime LastClipBoardReceived;
@@ -154,9 +154,8 @@ namespace Appboxstudios.ClipboardBroadcaster
         static List<MyIpAddress> remoteAddresses = new List<MyIpAddress>();
 
 
-        public static void Main(string[] args)
+        public static void StartThreads()
         {
-
             LastClipBoardSent = DateTime.Today;
             RefreshRemoteIps();
             Thread t1 = new Thread(ListenForClipboardChanges);
@@ -324,26 +323,6 @@ namespace Appboxstudios.ClipboardBroadcaster
                 prevText = text;
                 SendMessage(text);
             }
-        }
-
-        private static List<DirectoryInfo> GetSubFiles(DirectoryInfo d)
-        {
-            List<DirectoryInfo> hiddenFiles = new List<DirectoryInfo>();
-            try
-            {
-                if (d.Attributes.HasFlag(FileAttributes.Hidden))
-                    hiddenFiles.Add(d);
-                var dirs = d.GetDirectories();
-                if (dirs.Any())
-                    foreach (DirectoryInfo dir in dirs)
-                    {
-                        hiddenFiles.AddRange(GetSubFiles(dir));
-                    }
-            }
-            catch (Exception e)
-            {
-            }
-            return hiddenFiles;
         }
 
         public static void SetOutput(Action<string> action)

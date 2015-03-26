@@ -4,7 +4,7 @@
         xmlns:roundProgressBar="clr-namespace:RoundProgressBar;assembly=RoundProgressBar"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
-        <roundProgressBar:CircularProgressBar x:Name="progressBarLoading" />
-        <TextBlock Text="{Binding Status}"/>
+        <roundProgressBar:CircularProgressBar x:Name="progressBarLoading" Width="100" />
+        <TextBlock Text="{Binding Status}" VerticalAlignment="Bottom" Margin="10" FontSize="30"/>
     </Grid>
 </Window>
