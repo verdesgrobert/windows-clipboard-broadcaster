@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Appboxstudios.ClipboardBroadcaster
@@ -13,11 +10,11 @@ namespace Appboxstudios.ClipboardBroadcaster
     {
         private static DateTime LastClipBoardSent;
         private static DateTime LastClipBoardReceived;
-        private static int port = 20712;
+        private const int port = 20712;
         private static string prevText = "";
         public static void StartListeningForRemoteClipBoard()
         {
-            TcpListener tcpListener = new TcpListener(port);
+            var tcpListener = new TcpListener(port);
             tcpListener.Start();
             while (true)
             {
@@ -30,7 +27,7 @@ namespace Appboxstudios.ClipboardBroadcaster
                 if (ok)
                     try
                     {
-                        byte[] arr = new byte[client.Available];
+                        var arr = new byte[client.Available];
                         stream.Read(arr, 0, arr.Length);
                         string data = Encoding.UTF8.GetString(arr);
                         if (data != Clipboard.GetText())
@@ -50,7 +47,5 @@ namespace Appboxstudios.ClipboardBroadcaster
                 }
             }
         }
-
-
     }
 }

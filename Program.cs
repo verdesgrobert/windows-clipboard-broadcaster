@@ -10,6 +10,7 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Appboxstudios.ClipboardBroadcaster
@@ -157,7 +158,7 @@ namespace Appboxstudios.ClipboardBroadcaster
         {
 
             LastClipBoardSent = DateTime.Today;
-            GetMyIps();
+            RefreshRemoteIps();
             Thread t1 = new Thread(ListenForClipboardChanges);
             t1.SetApartmentState(ApartmentState.STA);
             t1.Start();
@@ -171,7 +172,7 @@ namespace Appboxstudios.ClipboardBroadcaster
         }
 
 
-        static void GetMyIps()
+        static void RefreshRemoteIps()
         {
             List<IPAddress> addresses = new List<IPAddress>();
             NetworkInterface[] networks = NetworkInterface.GetAllNetworkInterfaces();
@@ -228,12 +229,12 @@ namespace Appboxstudios.ClipboardBroadcaster
             }
         }
 
-        static void StartListeningForDevices()
+        public async static void StartListeningForDevices()
         {
             while (true)
             {
-                Thread.Sleep(TimeSpan.FromMinutes(1));
-                GetMyIps();
+                RefreshRemoteIps();
+                await Task.Delay(TimeSpan.FromSeconds(30));
             }
         }
         private static void ListenForClipboardChanges()

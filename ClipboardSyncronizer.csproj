@@ -33,7 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>ClipboardBroadcasterView.App</StartupObject>
+    <StartupObject>Appboxstudios.ClipboardBroadcaster.App</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
