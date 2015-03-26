@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -24,6 +26,14 @@ namespace Appboxstudios.ClipboardBroadcaster
             DataContext = this;
         }
 
+        public static readonly DependencyProperty RemoteAddressesProperty = DependencyProperty.Register(
+            "RemoteAddresses", typeof(ObservableCollection<MyIpAddress>), typeof(MainWindow), new PropertyMetadata(default(ObservableCollection<MyIpAddress>)));
+
+        public ObservableCollection<MyIpAddress> RemoteAddresses
+        {
+            get { return (ObservableCollection<MyIpAddress>)GetValue(RemoteAddressesProperty); }
+            set { SetValue(RemoteAddressesProperty, value); }
+        }
         public string Status
         {
             get { return _status; }
@@ -39,7 +49,7 @@ namespace Appboxstudios.ClipboardBroadcaster
         {
             var th = new Thread(async () =>
             {
-                await Task.Run(() => ClipBoardHelper.StartListeningForDevices());
+                await Task.Run(() => ClipBoardHelper.StartListeningForDevices(RemoteAddresses.Add));
             });
             th.Start();
         }

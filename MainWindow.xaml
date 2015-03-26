@@ -15,15 +15,18 @@
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Width="70" Height="70">
-                        <roundProgressBar:CircularProgressBar HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <roundProgressBar:CircularProgressBar Width="70" Height="70" HorizontalAlignment="Center" CircleSize="10" VerticalAlignment="Center"/>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
-            <ListBoxItem Background="Gray" Width="70" Height="70" Margin="5">
-                <roundProgressBar:CircularProgressBar HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <ListBoxItem  Width="150" Height="150" Margin="5">
+                <roundProgressBar:CircularProgressBar Width="150" Height="150" HorizontalAlignment="Center" CircleSize="12" CircleDiameter="45" VerticalAlignment="Center"/>
             </ListBoxItem>
-            <ListBoxItem Background="LightGray" Width="70" Height="70" Margin="5">
-                <roundProgressBar:CircularProgressBar HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <ListBoxItem  Width="100" Height="100" Margin="5">
+                <roundProgressBar:CircularProgressBar Width="100" Height="100" HorizontalAlignment="Center" CircleSize="9" VerticalAlignment="Center"/>
+            </ListBoxItem>
+            <ListBoxItem  Width="70" Height="70" Margin="5">
+                <roundProgressBar:CircularProgressBar Width="70" Height="70" HorizontalAlignment="Center" CircleSize="6" VerticalAlignment="Center"/>
             </ListBoxItem>
         </ListBox>
     </Grid>
