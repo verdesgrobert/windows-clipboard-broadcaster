@@ -20,7 +20,7 @@ namespace Appboxstudios.ClipboardBroadcaster
         private static DateTime LastClipBoardSent;
         private static DateTime LastClipBoardReceived;
         private static int port = 20712;
-        private static Action<string> output = msg => Console.WriteLine(msg);
+        private static Action<string> log = msg => Console.WriteLine(msg);
         private static void SendMessage(string text, byte messageType = 0, byte[] data = null, string footer = "")
         {
             LastClipBoardSent = DateTime.Now;
@@ -92,7 +92,7 @@ namespace Appboxstudios.ClipboardBroadcaster
             }
             catch (Exception e)
             {
-                output(e + "");
+                log(e + "");
             }
             add.IsSending = false;
         }
@@ -119,7 +119,7 @@ namespace Appboxstudios.ClipboardBroadcaster
             while (true)
             {
                 var client = tcpListener.AcceptTcpClient();
-                output("Connected:" + client.Client.RemoteEndPoint);
+                log("Connected:" + client.Client.RemoteEndPoint);
                 var stream = client.GetStream();
                 Thread.Sleep(1000);
                 bool ok = client.Available > 0;
@@ -135,11 +135,11 @@ namespace Appboxstudios.ClipboardBroadcaster
                             prevText = data;
                             Clipboard.SetText(data);
                         }
-                        output(data);
+                        log(data);
                     }
                     catch (Exception e)
                     {
-                        output(e + "");
+                        log(e + "");
                     }
                 else
                 {
@@ -167,60 +167,70 @@ namespace Appboxstudios.ClipboardBroadcaster
 
         static void RefreshRemoteIps()
         {
-            List<IPAddress> addresses = new List<IPAddress>();
-            NetworkInterface[] networks = NetworkInterface.GetAllNetworkInterfaces();
-            networks = networks.Where(conn => conn.OperationalStatus == OperationalStatus.Up && conn.NetworkInterfaceType != NetworkInterfaceType.Loopback).ToArray();
-            foreach (NetworkInterface network in networks)
-            {
-                output("Unicast Addresses");
-                foreach (UnicastIPAddressInformation entry in network.GetIPProperties().UnicastAddresses)
-                {
-                    if (entry.Address.AddressFamily == AddressFamily.InterNetwork)
-                    {
-                        addresses.Add(entry.Address);
-                    }
-                }
-            }
-            var addrs = addresses.GroupBy(el => el.ToString().Substring(0, el.ToString().LastIndexOf(".") + 1)).Select(el => el.Key).ToList();
+            var addresses = FindAddressesFromNetworkInterfaces();
+            var baseAddresses = addresses.GroupBy(el => el.ToString().Substring(0, el.ToString().LastIndexOf(".") + 1)).Select(el => el.Key).ToList();
             addresses.Clear();
-            int tot = addrs.Count * 255;
+            int tot = baseAddresses.Count * 255;
             int cntr = 0;
-            foreach (string address in addrs)
+            foreach (string baseAddress in baseAddresses)
             {
-                string addr = address;
-                int last = addr.LastIndexOf(".") + 1;
-                string subnet = addr.Substring(0, last);
+                string baseAddr = baseAddress;
+                int last = baseAddr.LastIndexOf(".") + 1;
+                string subnet = baseAddr.Substring(0, last);
                 for (int x = 1; x <= 255; x++)
                 {
                     cntr++;
-                    output((subnet + x) + ":" + cntr + "/" + tot);
-                    if (remoteAddresses.Any(add => add.ToString() == subnet + x)) continue;
-                    var ip = IPAddress.Parse(subnet + x);
+                    string ipAddressToTest = subnet + x;
+                    log(ipAddressToTest + ":" + cntr + "/" + tot);
+                    if (remoteAddresses.Any(address => address.ToString() == ipAddressToTest)) continue;
+
                     try
                     {
                         try
                         {
                             var now = DateTime.Now;
-                            TcpClientWithTimeout tcp = new TcpClientWithTimeout(subnet + x, 20712, 20);
+                            TcpClientWithTimeout tcp = new TcpClientWithTimeout(ipAddressToTest, 20712, 20);
                             TcpClient cl = new TcpClient();
                             tcp.Connect(out cl);
                             if (cl != null)
                                 if (cl.Connected)
                                 {
+                                    var ip = IPAddress.Parse(ipAddressToTest);
                                     var addressItem = new MyIpAddress(ip);
                                     remoteAddresses.Add(addressItem);
                                     AddressFoundCallback(addressItem);
-                                    output(ip + "\t" + DateTime.Now.Subtract(now).TotalMilliseconds);
+                                    log(ip + "\t" + DateTime.Now.Subtract(now).TotalMilliseconds);
                                 }
                         }
                         catch (Exception e)
                         {
-                            output(e + "");
+                            log(e + "");
                         }
                     }
                     catch (Exception ex) { }
                 }
             }
+        }
+
+        private static List<IPAddress> FindAddressesFromNetworkInterfaces()
+        {
+            List<IPAddress> addresses = new List<IPAddress>();
+            NetworkInterface[] networks = NetworkInterface.GetAllNetworkInterfaces();
+            networks =
+                networks.Where(
+                    conn =>
+                        conn.OperationalStatus == OperationalStatus.Up &&
+                        conn.NetworkInterfaceType != NetworkInterfaceType.Loopback).ToArray();
+            foreach (var addressesToAdd in networks
+                .Select(network =>
+                    network.GetIPProperties()
+                    .UnicastAddresses
+                      .Where(entry => entry.Address.AddressFamily == AddressFamily.InterNetwork)
+                      .Select(entry => entry.Address)))
+            {
+                addresses.AddRange(addressesToAdd);
+            }
+            return addresses;
         }
 
         private static Action<MyIpAddress> AddressFoundCallback;
@@ -324,7 +334,7 @@ namespace Appboxstudios.ClipboardBroadcaster
 
         public static void SetOutput(Action<string> action)
         {
-            output = action;
+            log = action;
         }
 
     }
