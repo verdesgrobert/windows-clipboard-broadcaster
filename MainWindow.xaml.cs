@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Threading;
@@ -19,10 +20,12 @@ namespace Appboxstudios.ClipboardBroadcaster
             InitializeComponent();
             Loaded += MainWindow_Loaded;
 
-            ClipBoardHelper.SetOutput(msg =>
+            ClipBoardHelper.SetOutput(msg => Dispatcher.BeginInvoke((Action)(() =>
             {
                 Status = msg;
-            });
+            })));
+            RemoteAddresses = new ObservableCollection<MyIpAddress>();
+            RemoteAddresses.Add(new MyIpAddress(null));
             DataContext = this;
         }
 
@@ -40,6 +43,7 @@ namespace Appboxstudios.ClipboardBroadcaster
             set
             {
                 _status = value;
+                txtStatus.Text = _status;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("Status"));
             }
@@ -49,7 +53,7 @@ namespace Appboxstudios.ClipboardBroadcaster
         {
             var th = new Thread(async () =>
             {
-                await Task.Run(() => ClipBoardHelper.StartListeningForDevices(RemoteAddresses.Add));
+                await Task.Run(() => ClipBoardHelper.StartListeningForDevices(address => RemoteAddresses.Insert(RemoteAddresses.Count - 1, address)));
             });
             th.Start();
         }

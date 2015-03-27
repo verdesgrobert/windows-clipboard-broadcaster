@@ -4,9 +4,7 @@
         xmlns:roundProgressBar="clr-namespace:RoundProgressBar;assembly=RoundProgressBar"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
-        <roundProgressBar:CircularProgressBar x:Name="progressBarLoading" Width="100" />
-        <TextBlock Text="{Binding Status}" VerticalAlignment="Bottom" Margin="10" FontSize="30"/>
-        <ListBox>
+        <ListBox ItemsSource="{Binding RemoteAddresses}">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel/>
@@ -14,20 +12,14 @@
             </ListBox.ItemsPanel>
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Width="70" Height="70">
-                        <roundProgressBar:CircularProgressBar Width="70" Height="70" HorizontalAlignment="Center" CircleSize="10" VerticalAlignment="Center"/>
-                    </StackPanel>
+                    <Grid Width="100" Height="100">
+                        <TextBlock TextWrapping="Wrap" TextTrimming="CharacterEllipsis" Text="{Binding EndpointName}"/>
+                        <roundProgressBar:CircularProgressBar Visibility="{Binding Connecting}" Color="DarkGreen" Width="100" Height="100" HorizontalAlignment="Center" CircleSize="10" VerticalAlignment="Center"/>
+                    </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
-            <ListBoxItem  Width="150" Height="150" Margin="5">
-                <roundProgressBar:CircularProgressBar Width="150" Height="150" Color="DarkBlue"  HorizontalAlignment="Center" CircleSize="12" CircleDiameter="45" VerticalAlignment="Center"/>
-            </ListBoxItem>
-            <ListBoxItem  Width="100" Height="100" Margin="5">
-                <roundProgressBar:CircularProgressBar Width="100" Height="100" Color="DarkGreen" HorizontalAlignment="Center" CircleSize="9" VerticalAlignment="Center"/>
-            </ListBoxItem>
-            <ListBoxItem  Width="70" Height="70" Margin="5">
-                <roundProgressBar:CircularProgressBar Width="70" Height="70" Color="DarkOrange" HorizontalAlignment="Center" CircleSize="6" VerticalAlignment="Center"/>
-            </ListBoxItem>
         </ListBox>
+        <TextBlock x:Name="txtStatus" Text="{Binding Status}" VerticalAlignment="Bottom" Margin="10" FontSize="30"/>
+
     </Grid>
 </Window>
