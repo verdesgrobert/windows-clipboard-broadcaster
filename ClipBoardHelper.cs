@@ -198,7 +198,8 @@ namespace Appboxstudios.ClipboardBroadcaster
                                     var ip = IPAddress.Parse(ipAddressToTest);
                                     var addressItem = new MyIpAddress(ip);
                                     remoteAddresses.Add(addressItem);
-                                    AddressFoundCallback(addressItem);
+                                    if (AddressFoundCallback != null)
+                                        AddressFoundCallback(addressItem);
                                     log(ip + "\t" + DateTime.Now.Subtract(now).TotalMilliseconds);
                                 }
                         }
@@ -236,6 +237,7 @@ namespace Appboxstudios.ClipboardBroadcaster
         private static Action<MyIpAddress> AddressFoundCallback;
         public async static Task StartListeningForDevices(Action<MyIpAddress> foundCallback)
         {
+            AddressFoundCallback = foundCallback;
             while (true)
             {
                 RefreshRemoteIps();

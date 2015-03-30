@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
@@ -53,9 +54,15 @@ namespace Appboxstudios.ClipboardBroadcaster
         {
             var th = new Thread(async () =>
             {
-                await Task.Run(() => ClipBoardHelper.StartListeningForDevices(address => RemoteAddresses.Insert(RemoteAddresses.Count - 1, address)));
+                await Task.Run(() => ClipBoardHelper.StartListeningForDevices(OnFoundCallback));
             });
             th.Start();
+        }
+
+        private void OnFoundCallback(MyIpAddress address)
+        {
+            RemoteAddresses.Add(address);
+            DataContext = this;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
